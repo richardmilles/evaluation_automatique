@@ -49,3 +49,7 @@ class PlagiarismCheck(models.Model):
     submission_2 = models.ForeignKey(Submission, on_delete=models.CASCADE, related_name="plagiarism_checks_2")
     similarity_score = models.DecimalField(max_digits=5, decimal_places=2)
     detected_at = models.DateTimeField(auto_now_add=True)
+
+
+
+
