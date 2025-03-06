@@ -20,7 +20,7 @@ class User(AbstractUser):
         related_name="api_users_permissions",  # Nom unique
         blank=True
     )
-
+   
 # 📌 Modèle Exercices
 class Exercise(models.Model):
     title = models.CharField(max_length=255)
