@@ -38,7 +38,7 @@ DATABASES = {
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
-
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Ajout du répertoire staticfiles
 
 # 📌 Utilisation des variables d'environnement pour la clé secrète et le mode DEBUG
 SECRET_KEY = os.getenv("SECRET_KEY", "django-insecure-))09u0gey)evwq7k7k1rdg(dq7boh*ypli7@@=(6mc&q47ah29")
