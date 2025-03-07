@@ -44,6 +44,7 @@ class ExerciseViewSet(viewsets.ModelViewSet):
     def perform_create(self, serializer):
         serializer.save(professor=self.request.user)
 
+
 # 🔹 Vue API Soumissions (SEULS LES ÉTUDIANTS peuvent soumettre)
 class SubmissionViewSet(viewsets.ModelViewSet):
     queryset = Submission.objects.all()
