@@ -1,4 +1,4 @@
-name: Deploy to Railway
+name: Deploy to Koyeb
 on:
   push:
     branches:
@@ -22,7 +22,7 @@ jobs:
       - name: Run Migrations
         run: python manage.py migrate
 
-      - name: Deploy on Railway
+      - name: Deploy on Koyeb
         env:
-          RAILWAY_TOKEN: ${{ secrets.RAILWAY_TOKEN }}
-        run: railway up
+          KOYEB_TOKEN: ${{ secrets.KOYEB_TOKEN }}
+        run: koyeb service update

@@ -10,6 +10,7 @@ For the full list of settings and their values, see
 https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 
+from datetime import timedelta
 from pathlib import Path
 
 import os
@@ -36,6 +37,9 @@ DATABASES = {
     ),
 }
 
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+STORAGE_BUCKET = "submissions"  # 🔹 Nom du dossier Supabase Storage
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
 STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles') # Ajout du répertoire staticfiles
@@ -61,6 +65,12 @@ DEBUG = True
 
 ALLOWED_HOSTS = []
 
+OLLAMA_MODEL = "deepseek"
+USE_CLOUD_AI = os.getenv("USE_CLOUD_AI", "False") == "True"  # Par défaut, utilise Ollama en local
+
+CLOUD_AI_URL = os.getenv("CLOUD_AI_URL", "https://api.deepseek.com")  # URL de l’API DeepSeek (si activé)
+CLOUD_AI_KEY = os.getenv("CLOUD_AI_KEY", "")  # Clé API de DeepSeek Cloud (si activé)
+AUTH_USER_MODEL = 'api.User' # Utiliser le modèle User personnalisé
 
 # Application definition
 
@@ -78,6 +88,7 @@ INSTALLED_APPS = [
 
     # Django REST Framework
     "rest_framework",
+    "rest_framework_simplejwt",  # Important pour JWT"
     "corsheaders",
 ]
 
@@ -165,3 +176,18 @@ STATIC_URL = "static/"
 # https://docs.djangoproject.com/en/5.1/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
+
+REST_FRAMEWORK = {
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "rest_framework_simplejwt.authentication.JWTAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
+}   # Configuration de Django REST Framework
+
+SIMPLE_JWT = {
+    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+}  # Configuration de Simple JWT
