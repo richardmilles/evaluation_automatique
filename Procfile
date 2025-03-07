@@ -1,1 +1,1 @@
-web: waitress-serve --port=$PORT config.wsgi:application
+web: waitress-serve --port=${PORT:-8000} config.wsgi:application
