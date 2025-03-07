@@ -31,7 +31,7 @@ load_dotenv()
 DATABASES = {
     'default': dj_database_url.config(
         default=f"postgresql://{os.getenv('user')}:{os.getenv('password')}"
-                f"@{os.getenv('host')}:{os.getenv('port')}/{os.getenv('dbname')}",
+                f"@{os.getenv('host')}:{os.getenv('SUPABASE_DB_PORT')}/{os.getenv('dbname')}",
         conn_max_age=600
     ),
 }
