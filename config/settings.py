@@ -12,7 +12,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 
 from datetime import timedelta
 from pathlib import Path
-
+from distutils.util import strtobool
 import os
 from dotenv import load_dotenv
 import dj_database_url
@@ -66,8 +66,10 @@ DEBUG = True
 ALLOWED_HOSTS = []
 
 OLLAMA_MODEL = "deepseek"
-USE_CLOUD_AI = os.getenv("USE_CLOUD_AI", "False") == "True"  # Par défaut, utilise Ollama en local
-
+#USE_CLOUD_AI = os.getenv("USE_CLOUD_AI", "False") == "True"  # Par défaut, utilise Ollama en local
+#USE_CLOUD_AI = bool(strtobool(os.getenv("USE_CLOUD_AI", "False")))
+USE_CLOUD_AI = bool(strtobool(os.getenv("BDA_USE_CLOUD_AI", "False")))
+AI_PROVIDER = os.getenv("AI_PROVIDER", "ollama")
 CLOUD_AI_URL = os.getenv("CLOUD_AI_URL", "https://api.deepseek.com")  # URL de l’API DeepSeek (si activé)
 CLOUD_AI_KEY = os.getenv("CLOUD_AI_KEY", "")  # Clé API de DeepSeek Cloud (si activé)
 AUTH_USER_MODEL = 'api.User' # Utiliser le modèle User personnalisé

@@ -2,6 +2,10 @@
 """Django's command-line utility for administrative tasks."""
 import os
 import sys
+import os
+from dotenv import load_dotenv
+
+load_dotenv()  # ✅ Force le chargement des variables depuis .env
 
 
 def main():

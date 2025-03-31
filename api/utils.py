@@ -1,3 +1,4 @@
+from config import settings
 import supabase
 import uuid
 import os
@@ -18,6 +19,8 @@ from django.urls import path, include
 from rest_framework.routers import DefaultRouter
 from dotenv import load_dotenv
 load_dotenv()
+from distutils.util import strtobool
+
 
 
 SUPABASE_URL = os.getenv("SUPABASE_URL")
@@ -67,6 +70,33 @@ def extract_text_from_pdf(pdf_url):
         return text.strip()
     else:
         raise Exception("Erreur de téléchargement du PDF.")
+    
+def evaluate_with_deepseek(prompt):
+    url = "https://api.deepseek.com/chat/completions"
+
+    headers = {
+        "Authorization": f"Bearer {os.getenv('DEEPSEEK_API_KEY')}",
+        "Content-Type": "application/json"
+    }
+
+    payload = {
+        "model": "deepseek-chat",  # ou "deepseek-reasoner"
+        "messages": [
+            {"role": "system", "content": "Tu es un assistant de correction pédagogique."},
+            {"role": "user", "content": prompt}
+        ],
+        "stream": False
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=payload, timeout=30)
+        response.raise_for_status()
+        data = response.json()
+        print("✅ Réponse DeepSeek =", data)
+        return data["choices"][0]["message"]["content"]
+    except requests.exceptions.RequestException as e:
+        print("🚨 Erreur DeepSeek =", e)
+        return f"[Erreur DeepSeek] {str(e)}"
 
 
 '''
@@ -108,6 +138,44 @@ def evaluate_submission(student_text, model_answer):
         response = ollama.chat(model="deepseek", messages=[{"role": "user", "content": prompt}])
         return response.get("content", "Erreur lors de la correction.") 
 '''
+import os
+
+def evaluate_submission(student_text, model_answer):
+    prompt = f"""
+    tu es un assistant pédagogique spécialisé en base de données.
+
+Compare la réponse d’un étudiant à la solution modèle d’un exercice SQL.
+
+Donne une note sur 20 suivie d’un feedback structuré avec :
+- les erreurs identifiées
+- les points corrects
+- et une amélioration suggérée.
+
+    ➤ Réponse Étudiant :
+    {student_text}
+
+    ➤ Correction Modèle :
+    {model_answer}
+
+    Donne une note sur 20 suivie d'un feedback pédagogique clair.
+    """
+
+    use_cloud = settings.USE_CLOUD_AI
+    ai_provider = settings.AI_PROVIDER.lower()
+
+    print("🔍 DEBUG USE_CLOUD_AI =", use_cloud)
+    print("🔍 DEBUG AI_PROVIDER =", ai_provider)
+
+    if not use_cloud:
+        return evaluate_with_ollama(prompt)
+    
+    if ai_provider == "openrouter":
+        return evaluate_with_openrouter(prompt)
+    elif ai_provider == "deepseek":
+        return evaluate_with_deepseek(prompt)
+    else:
+        return "[Erreur] Fournisseur IA non supporté."
+'''
 def evaluate_submission(student_text, model_answer):
     prompt = f"""
     Corrige cette réponse d'étudiant comparée au modèle :
@@ -121,10 +189,13 @@ def evaluate_submission(student_text, model_answer):
     Donne une note sur 20 suivie d'un feedback pédagogique clair.
     """
 
-    use_cloud = os.getenv("USE_CLOUD_AI", "False") == "True"
-    ai_provider = os.getenv("AI_PROVIDER", "ollama")
+    use_cloud = settings.USE_CLOUD_AI
+    ai_provider = settings.AI_PROVIDER
 
-    if use_cloud and ai_provider == "openrouter":
+    print("🔍 DEBUG USE_CLOUD_AI =", use_cloud)
+    print("🔍 DEBUG AI_PROVIDER =", ai_provider)
+
+    if use_cloud and ai_provider.lower() == "openrouter":
         return evaluate_with_openrouter(prompt)
     else:
         return evaluate_with_ollama(prompt)
@@ -135,7 +206,9 @@ def evaluate_with_ollama(prompt):
         messages=[{"role": "user", "content": prompt}]
     )
     return response.get("message", {}).get("content") or response.get("content")
+'''
 
+'''
 def evaluate_with_openrouter(prompt):
     url = "https://openrouter.ai/api/v1/chat/completions"
     headers = {
@@ -156,6 +229,35 @@ def evaluate_with_openrouter(prompt):
         return response.json()["choices"][0]["message"]["content"]
     else:
         return f"Erreur OpenRouter : {response.text}"
+'''
+def evaluate_with_openrouter(prompt):
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", ""),
+        "X-Title": os.getenv("OPENROUTER_TITLE", "")
+    }
+
+    payload = {
+ #       "model": "deepseek/deepseek-v3-base:free",
+        "model": "deepseek/deepseek-v3-base:free",
+
+        "messages": [{"role": "user", "content": prompt}]
+    }
+
+    try:
+        response = requests.post(url, headers=headers, json=payload)
+        response.raise_for_status()
+        data = response.json()
+
+        # 🔥 Ajoute ce print pour vérifier précisément ce que renvoie OpenRouter :
+        print("✅ Réponse OpenRouter =", data)
+
+        return data["choices"][0]["message"]["content"]
+    except requests.exceptions.RequestException as e:
+        print("🚨 Erreur OpenRouter =", e)
+        return f"[Erreur OpenRouter] {str(e)}"
 
 def extract_grade_from_feedback(feedback):
     """
