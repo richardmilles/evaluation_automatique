@@ -55,6 +55,7 @@ class SubmissionViewSet(viewsets.ModelViewSet):
         file = self.request.FILES.get('pdf')  # Récupérer le fichier PDF
         if file:
             file_url = upload_pdf(file)  # Téléverser sur Supabase
+            serializer.save(student=self.request.user, pdf_url=file_url)
             extracted_text = extract_text_from_pdf(file)  # Extraire le texte
             processed_text = preprocess_text(extracted_text)  # Nettoyer le texte
 
@@ -98,6 +99,8 @@ class SubmissionViewSet(viewsets.ModelViewSet):
         file = self.request.FILES.get('pdf')  # Récupérer le fichier PDF
         if file:
             file_url = upload_pdf(file)  # ✅ Téléverser le fichier sur Supabase
+            extracted_text = extract_text_from_pdf(file_url)  # Passe l'URL du fichier téléchargé
+            processed_text = preprocess_text(extracted_text)
             if file_url:
                 serializer.save(student=self.request.user, pdf_url=file_url)  # ✅ Sauvegarde dans la BDD
             else:

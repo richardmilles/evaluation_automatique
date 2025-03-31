@@ -19,7 +19,7 @@ class ExerciseSerializer(serializers.ModelSerializer):
         model = Exercise
         fields = ['id', 'title', 'description', 'professor', 'model_answer', 'created_at']
 
-# 🔹 Sérializer Soumissions
+'''# 🔹 Sérializer Soumissions
 class SubmissionSerializer(serializers.ModelSerializer):
     pdf = serializers.FileField(write_only=True, required=True)  # ✅ Ajout du champ PDF
 
@@ -27,6 +27,21 @@ class SubmissionSerializer(serializers.ModelSerializer):
         model = Submission
         fields = ['id', 'exercise', 'student', 'pdf', 'pdf_url', 'submitted_at']
         read_only_fields = ['student', 'pdf_url', 'submitted_at']
+'''
+
+class SubmissionSerializer(serializers.ModelSerializer):
+    pdf = serializers.FileField(write_only=True, required=True)  # champ temporaire, pas dans le modèle
+
+    class Meta:
+        model = Submission
+        fields = ['id', 'exercise', 'student', 'pdf', 'pdf_url', 'submitted_at']
+        read_only_fields = ['student', 'pdf_url', 'submitted_at']
+
+    def create(self, validated_data):
+        # On retire le champ 'pdf' car il n'existe pas dans le modèle
+        pdf_file = validated_data.pop('pdf')
+        # Tu peux gérer upload_pdf ici si tu préfères
+        return super().create(validated_data)
 
 # 🔹 Sérializer Correction IA
 class CorrectionSerializer(serializers.ModelSerializer):

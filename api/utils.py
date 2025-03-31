@@ -6,7 +6,8 @@ import pdfplumber
 from io import BytesIO
 import ollama
 import re
-
+from supabase.client import create_client
+import requests
 import nltk
 from nltk.tokenize import word_tokenize
 from nltk.corpus import stopwords
@@ -15,28 +16,60 @@ from sklearn.metrics.pairwise import cosine_similarity
 import string
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
+from dotenv import load_dotenv
+load_dotenv()
 
 
+SUPABASE_URL = os.getenv("SUPABASE_URL")
+SUPABASE_KEY = os.getenv("SUPABASE_KEY")
+
+
+# Initialisation du client Supabase
+supabase_client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
 # Télécharger les ressources nécessaires pour nltk
 nltk.download('punkt')
 nltk.download('stopwords')
 
 # Initialiser le client Supabase
-supabase_client = supabase.create_client(os.getenv("SUPABASE_URL"), os.getenv("SUPABASE_KEY"))
-
 def upload_pdf(file):
-    """Téléverse un fichier PDF sur Supabase Storage et retourne l'URL"""
-    file_id = str(uuid.uuid4()) + ".pdf"  # Générer un ID unique pour le fichier
-    response = supabase_client.storage.from_("submissions").upload(file_id, file)
-    
-    # Construire l'URL publique du fichier
+    """
+    Téléverse un fichier PDF sur Supabase Storage depuis un InMemoryUploadedFile
+    """
+    file_id = f"{uuid.uuid4()}.pdf"
+    file_content = file.read()  # Lire le contenu binaire du fichier
+
+    response = supabase_client.storage.from_("submissions").upload(
+        file_id,
+        file_content,
+        {"content-type": "application/pdf"}
+    )
+
     if response:
-        return f"{os.getenv('SUPABASE_URL')}/storage/v1/object/public/submissions/{file_id}"
+        file_url = f"{SUPABASE_URL}/storage/v1/object/public/submissions/{file_id}"
+        return file_url
     else:
-        return None
+        raise Exception("Échec du téléchargement sur Supabase")
+    
+def extract_text_from_pdf(pdf_url):
+    """
+    Extrait le texte d’un fichier PDF à partir d’une URL Supabase
+    """
+    response = requests.get(pdf_url)
+    if response.status_code == 200:
+        pdf_file = BytesIO(response.content)
+        text = ""
+        with pdfplumber.open(pdf_file) as pdf:
+            for page in pdf.pages:
+                page_text = page.extract_text()
+                if page_text:
+                    text += page_text + "\n"
+        return text.strip()
+    else:
+        raise Exception("Erreur de téléchargement du PDF.")
 
 
+'''
 def extract_text_from_pdf(pdf_file):
     """ Extrait le texte d'un fichier PDF """
     text = ""
@@ -74,8 +107,55 @@ def evaluate_submission(student_text, model_answer):
         # 🔹 Mode Local (Ollama)
         response = ollama.chat(model="deepseek", messages=[{"role": "user", "content": prompt}])
         return response.get("content", "Erreur lors de la correction.") 
+'''
+def evaluate_submission(student_text, model_answer):
+    prompt = f"""
+    Corrige cette réponse d'étudiant comparée au modèle :
 
+    ➤ Réponse Étudiant :
+    {student_text}
 
+    ➤ Correction Modèle :
+    {model_answer}
+
+    Donne une note sur 20 suivie d'un feedback pédagogique clair.
+    """
+
+    use_cloud = os.getenv("USE_CLOUD_AI", "False") == "True"
+    ai_provider = os.getenv("AI_PROVIDER", "ollama")
+
+    if use_cloud and ai_provider == "openrouter":
+        return evaluate_with_openrouter(prompt)
+    else:
+        return evaluate_with_ollama(prompt)
+
+def evaluate_with_ollama(prompt):
+    response = ollama.chat(
+        model="deepseek",
+        messages=[{"role": "user", "content": prompt}]
+    )
+    return response.get("message", {}).get("content") or response.get("content")
+
+def evaluate_with_openrouter(prompt):
+    url = "https://openrouter.ai/api/v1/chat/completions"
+    headers = {
+        "Authorization": f"Bearer {os.getenv('OPENROUTER_API_KEY')}",
+        "Content-Type": "application/json",
+        "HTTP-Referer": os.getenv("OPENROUTER_SITE_URL", ""),
+        "X-Title": os.getenv("OPENROUTER_TITLE", "")
+    }
+
+    payload = {
+        "model": "deepseek/deepseek-v3-base:free",  # ou un autre modèle si tu veux
+        "messages": [{"role": "user", "content": prompt}]
+    }
+
+    response = requests.post(url, headers=headers, json=payload)
+
+    if response.status_code == 200:
+        return response.json()["choices"][0]["message"]["content"]
+    else:
+        return f"Erreur OpenRouter : {response.text}"
 
 def extract_grade_from_feedback(feedback):
     """
