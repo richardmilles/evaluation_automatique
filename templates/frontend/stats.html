@@ -1,0 +1,39 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Statistiques</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script src="{% static 'frontend/script.js' %}"></script>
+  <link href="{% static 'frontend/style.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-50 p-6 font-sans">
+  <div class="max-w-4xl mx-auto bg-white p-6 rounded shadow">
+    <h1 class="text-2xl font-bold mb-6">Statistiques des performances</h1>
+    <canvas id="chartNotes" height="150"></canvas>
+  </div>
+
+  <script>
+    const ctx = document.getElementById('chartNotes').getContext('2d');
+    new Chart(ctx, {
+      type: 'bar',
+      data: {
+        labels: ['Sujet 1', 'Sujet 2', 'Sujet 3'],
+        datasets: [{
+          label: 'Moyenne des notes',
+          data: [14, 12, 16],
+          backgroundColor: ['#60A5FA', '#34D399', '#FBBF24']
+        }]
+      },
+      options: {
+        scales: {
+          y: { beginAtZero: true, max: 20 }
+        }
+      }
+    });
+  </script>
+</body>
+</html>

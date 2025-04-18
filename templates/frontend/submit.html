@@ -1,0 +1,23 @@
+{% load static %}
+<!-- templates/frontend/submit.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Soumettre un exercice</title>
+  <link href="{% static 'frontend/style.css' %}" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <link href="/static/frontend/style.css" rel="stylesheet">
+</head>
+<body class="bg-gray-100 p-8">
+  <div class="max-w-xl mx-auto bg-white rounded-xl shadow-md p-6">
+    <h2 class="text-xl font-bold mb-4">Soumettre un exercice</h2>
+    <form action="{% url 'submit' %}" method="post" enctype="multipart/form-data">
+      {% csrf_token %}
+      <label class="block mb-2 font-semibold">Fichier à soumettre :</label>
+      <input type="file" name="fichier" class="mb-4 w-full border rounded px-3 py-2">
+      <button type="submit" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700">Envoyer</button>
+    </form>
+  </div>
+</body>
+</html>

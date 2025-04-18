@@ -1,0 +1,28 @@
+{% load static %}
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Inscription</title>
+  <link href="{% static 'frontend/style.css' %}" rel="stylesheet" />
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="{% static 'frontend/register.js' %}"></script>
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen font-sans">
+  <div class="bg-white p-8 rounded shadow-md w-full max-w-md">
+    <h2 class="text-2xl font-bold mb-6 text-center">Créer un compte</h2>
+    <form id="registerForm" class="space-y-4">
+      <input type="text" id="username" placeholder="Nom d'utilisateur" class="w-full border p-3 rounded" required>
+      <input type="email" id="email" placeholder="Adresse e-mail" class="w-full border p-3 rounded" required>
+      <input type="password" id="password" placeholder="Mot de passe" class="w-full border p-3 rounded" required>
+      <select id="role" class="w-full border p-3 rounded" required>
+        <option value="">-- Choisir un rôle --</option>
+        <option value="student">Étudiant</option>
+        <option value="professor">Professeur</option>
+      </select>
+      <button type="submit" class="w-full bg-blue-600 text-white p-3 rounded hover:bg-blue-700 transition">S'inscrire</button>
+    </form>
+  </div>
+</body>
+</html>

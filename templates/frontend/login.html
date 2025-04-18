@@ -1,0 +1,23 @@
+{% load static %}
+
+<!-- login.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Connexion</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="{% static 'frontend/script.js' %}"></script>
+  <link href="{% static 'frontend/style.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-100 flex items-center justify-center min-h-screen">
+  <div class="bg-white p-6 rounded shadow-md w-full max-w-md">
+    <h2 class="text-2xl font-bold mb-4">Connexion</h2>
+    <form id="loginForm" class="space-y-4">
+      <input type="text" id="username" placeholder="Nom d'utilisateur" class="w-full border p-2 rounded">
+      <input type="password" id="password" placeholder="Mot de passe" class="w-full border p-2 rounded">
+      <button type="submit" class="w-full bg-blue-500 text-white p-2 rounded hover:bg-blue-600">Se connecter</button>
+    </form>
+  </div>
+</body>
+</html>

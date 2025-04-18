@@ -1,0 +1,23 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Accueil - AutoEval IA</title>
+  <link href="{% static 'frontend/style.css' %}" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+</head>
+<body class="bg-gray-100 font-sans">
+  <div class="min-h-screen flex flex-col items-center justify-center text-center px-6">
+    <h1 class="text-4xl font-bold text-blue-700 mb-4">Bienvenue sur AutoEval IA</h1>
+    <p class="text-gray-700 mb-6 max-w-2xl">
+      Une plateforme intelligente d’évaluation automatique des exercices de bases de données.
+      Connectez-vous pour accéder à votre tableau de bord.
+    </p>
+    <div class="space-x-4">
+      <a href="/login/" class="bg-blue-600 text-white px-4 py-2 rounded hover:bg-blue-700 transition">Connexion</a>
+      <a href="/register/" class="bg-gray-600 text-white px-4 py-2 rounded hover:bg-gray-700 transition">Inscription</a>
+    </div>
+  </div>
+</body>
+</html>

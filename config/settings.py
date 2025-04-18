@@ -37,6 +37,33 @@ DATABASES = {
     ),
 }
 
+BASE_DIR = Path(__file__).resolve().parent.parent
+
+# Templates
+TEMPLATES = [
+    {
+         'BACKEND': 'django.template.backends.django.DjangoTemplates',
+        'DIRS': [os.path.join(BASE_DIR, 'templates')], 
+        'APP_DIRS': True,
+        'OPTIONS': {
+            'context_processors': [
+                'django.template.context_processors.debug',
+                'django.template.context_processors.request',
+                'django.contrib.auth.context_processors.auth',
+                'django.contrib.messages.context_processors.messages',
+            ],
+        },
+    },
+]
+
+# Configuration des fichiers statiques
+STATIC_URL = '/static/'
+STATICFILES_DIRS = [
+    os.path.join(BASE_DIR, 'static'),  # Important: pointe vers le dossier 'static'
+]
+STATIC_ROOT = os.path.join(BASE_DIR, 'staticfiles')  # Pour la production
+
+
 SUPABASE_URL = os.getenv("SUPABASE_URL")
 SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 STORAGE_BUCKET = "submissions"  # 🔹 Nom du dossier Supabase Storage
@@ -110,22 +137,6 @@ CORS_ALLOWED_ORIGINS = ["http://localhost:3000"]  # Autoriser les requêtes depu
 CORS_ALLOW_HEADERS = ["content-type", "Authorization"]  # Autoriser ces en-têtes
 CORS_ALLOW_METHODS = ["DELETE", "GET", "OPTIONS", "PATCH", "POST", "PUT"]  # Autoriser ces méthodes
 
-
-TEMPLATES = [
-    {
-        "BACKEND": "django.template.backends.django.DjangoTemplates",
-        "DIRS": [],
-        "APP_DIRS": True,
-        "OPTIONS": {
-            "context_processors": [
-                "django.template.context_processors.debug",
-                "django.template.context_processors.request",
-                "django.contrib.auth.context_processors.auth",
-                "django.contrib.messages.context_processors.messages",
-            ],
-        },
-    },
-]
 
 WSGI_APPLICATION = "config.wsgi.application"
 

@@ -1,0 +1,31 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Tableau de bord professeur</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="{% static 'frontend/script.js' %}"></script>
+  <link href="{% static 'frontend/style.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-50 p-6 font-sans">
+  <div class="max-w-5xl mx-auto bg-white p-6 rounded shadow">
+    <h1 class="text-2xl font-bold mb-4">Tableau de bord professeur</h1>
+    <div class="mb-4">
+      <a href="create_exercise.html" class="bg-green-600 text-white px-4 py-2 rounded hover:bg-green-700">➕ Ajouter un sujet</a>
+    </div>
+    <h2 class="text-lg font-semibold mb-2">Sujets existants</h2>
+    <ul class="space-y-4">
+      <li class="p-4 border rounded hover:bg-gray-100 transition">
+        Sujet : Analyse d'une base de données relationnelle<br>
+        Soumissions : 12 | Moyenne : 14.5/20
+      </li>
+      <li class="p-4 border rounded hover:bg-gray-100 transition">
+        Sujet : Requêtes SQL imbriquées<br>
+        Soumissions : 9 | Moyenne : 11.8/20
+      </li>
+    </ul>
+  </div>
+</body>
+</html>

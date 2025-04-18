@@ -15,8 +15,47 @@ from rest_framework.response import Response
 from rest_framework.permissions import IsAuthenticated
 from .models import Submission, Correction
 from .utils import extract_text_from_pdf, evaluate_submission, extract_grade_from_feedback
+from rest_framework.decorators import api_view, permission_classes
+from rest_framework.permissions import AllowAny
 
+# 🔹 Vue d'accueil de l'API
+@api_view(['GET'])
+@permission_classes([AllowAny])  # Autoriser l'accès sans authentification
+def api_root(request):
+    return Response({
+        "message": "Bienvenue sur l'API d'évaluation automatique",
+        "endpoints": {
+            "admin": "/admin/",
+            "auth": {
+                "login": "/api/auth/login/",
+                "register": "/api/auth/register/"
+            },
+            "exercises": "/api/exercises/",
+            "submissions": "/api/submissions/",
+            "corrections": "/api/corrections/",
+            "plagiarism_checks": "/api/plagiarism-checks/"
+        },
+        "documentation": "Consultez la documentation pour les détails des endpoints"
+    })
 
+def create_exercise_view(request):
+    return render(request, 'frontend/create_exercise.html')
+def dashboard_etudiant_view(request):
+    return render(request, 'frontend/dashboard_etudiant.html')
+def dashboard_prof_view(request):
+    return render(request, 'frontend/dashboard_prof.html')
+def index_view(request):
+    return render(request, 'frontend/index.html')
+def login_view(request):
+    return render(request, 'frontend/login.html')
+def register_view(request):
+    return render(request, 'frontend/register.html')
+def result_view(request):
+    return render(request, 'frontend/result.html')
+def stats_view(request):
+    return render(request, 'frontend/stats.html')
+def submit_view(request):
+    return render(request, 'frontend/submit.html')
 
 
 # 🔹 Vue API Utilisateurs (RESTREINTE : Seuls les utilisateurs authentifiés peuvent voir leur propre profil)

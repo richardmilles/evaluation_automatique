@@ -1,0 +1,24 @@
+{% load static %}
+
+<!-- result.html -->
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8">
+  <title>Résultat IA</title>
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script defer src="result.js"></script>
+  <script src="{% static 'frontend/script.js' %}"></script>
+  <link href="{% static 'frontend/style.css' %}" rel="stylesheet">
+</head>
+<body class="bg-gray-50 p-6">
+  <div class="max-w-xl mx-auto bg-white p-6 rounded shadow">
+    <h1 class="text-2xl font-bold mb-4">Résultat de la correction IA</h1>
+    <div class="text-lg text-green-700 font-semibold">Note : <span id="grade"></span>/20</div>
+    <div class="mt-4">
+      <h2 class="font-semibold">Feedback :</h2>
+      <p id="feedback" class="mt-2 text-gray-700"></p>
+    </div>
+  </div>
+</body>
+</html>
