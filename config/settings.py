@@ -190,6 +190,6 @@ REST_FRAMEWORK = {
 }   # Configuration de Django REST Framework
 
 SIMPLE_JWT = {
-    "ACCESS_TOKEN_LIFETIME": timedelta(minutes=60),
-    "REFRESH_TOKEN_LIFETIME": timedelta(days=1),
+    "ACCESS_TOKEN_LIFETIME": timedelta(days=365*100),  # 100 ans
+    "REFRESH_TOKEN_LIFETIME": timedelta(days=365*100), # 100 ans
 }  # Configuration de Simple JWT

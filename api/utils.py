@@ -9,9 +9,7 @@ import ollama
 import re
 from supabase.client import create_client
 import requests
-import nltk
-from nltk.tokenize import word_tokenize
-from nltk.corpus import stopwords
+import re
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.metrics.pairwise import cosine_similarity
 import string
@@ -30,10 +28,6 @@ SUPABASE_KEY = os.getenv("SUPABASE_KEY")
 # Initialisation du client Supabase
 supabase_client = create_client(SUPABASE_URL, SUPABASE_KEY)
 
-# Télécharger les ressources nécessaires pour nltk
-nltk.download('punkt')
-nltk.download('stopwords')
-
 # Initialiser le client Supabase
 def upload_pdf(file):
     """
@@ -41,17 +35,30 @@ def upload_pdf(file):
     """
     file_id = f"{uuid.uuid4()}.pdf"
     file_content = file.read()  # Lire le contenu binaire du fichier
+    file.seek(0)  # Remettre le pointeur au début pour extraction ultérieure
 
-    response = supabase_client.storage.from_("submissions").upload(
-        file_id,
-        file_content,
-        {"content-type": "application/pdf"}
-    )
+    # DEBUG : log taille du fichier et id
+    print(f"[DEBUG upload_pdf] file_id={file_id}, taille={len(file_content)} bytes")
+
+    # Tentative d'upload avec gestion du timeout (si supporté)
+    try:
+        response = supabase_client.storage.from_("submissions").upload(
+            file_id,
+            file_content,
+            {"content-type": "application/pdf"}
+            # timeout=30  # Décommente si la lib le supporte
+        )
+        print("[DEBUG upload_pdf] Réponse Supabase:", response)
+    except Exception as e:
+        print("[DEBUG upload_pdf] Exception lors de l'upload:", e)
+        raise
 
     if response:
         file_url = f"{SUPABASE_URL}/storage/v1/object/public/submissions/{file_id}"
+        print(f"[DEBUG upload_pdf] Upload OK. URL: {file_url}")
         return file_url
     else:
+        print("[DEBUG upload_pdf] Upload échoué, pas de réponse.")
         raise Exception("Échec du téléchargement sur Supabase")
     
 def extract_text_from_pdf(pdf_url):
@@ -241,7 +248,7 @@ def evaluate_with_openrouter(prompt):
 
     payload = {
  #       "model": "deepseek/deepseek-v3-base:free",
-        "model": "deepseek/deepseek-v3-base:free",
+        "model": "meta-llama/llama-3.3-70b-instruct",
 
         "messages": [{"role": "user", "content": prompt}]
     }
@@ -270,12 +277,16 @@ def extract_grade_from_feedback(feedback):
     return 0  # Retourne 0 si aucune note n'a été trouvée
 
 def preprocess_text(text):
-    """Nettoie et normalise le texte pour le traitement NLP"""
-    text = text.lower()  # Convertir en minuscule
-    text = text.translate(str.maketrans("", "", string.punctuation))  # Supprimer la ponctuation
-    tokens = word_tokenize(text)  # Tokenisation
-    tokens = [word for word in tokens if word not in stopwords.words('french')]  # Supprimer les stopwords
-    return " ".join(tokens)  # Rejoindre les tokens en une chaîne de texte
+    """Nettoie et normalise le texte pour le traitement NLP (sans NLTK)"""
+    text = text.lower()
+    tokens = re.findall(r'\b\w+\b', text)
+    stopwords_fr = {
+        'le', 'la', 'les', 'un', 'une', 'et', 'de', 'des', 'du', 'en', 'à', 'pour', 'par', 'avec', 'sur', 'dans',
+        'ce', 'ces', 'il', 'elle', 'on', 'nous', 'vous', 'ils', 'elles', 'ne', 'pas', 'que', 'qui', 'quoi', 'dont',
+        'où', 'mais', 'ou', 'donc', 'or', 'ni', 'car'
+    }
+    tokens = [word for word in tokens if word not in stopwords_fr]
+    return " ".join(tokens)
 
 def check_plagiarism(submission_text, other_texts):
     """

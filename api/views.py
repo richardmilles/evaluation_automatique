@@ -26,8 +26,11 @@ class UserViewSet(viewsets.ModelViewSet):
     permission_classes = [permissions.IsAuthenticated]
 
     def get_queryset(self):
-        """ Un utilisateur ne peut voir que ses propres informations """
-        return User.objects.filter(id=self.request.user.id)
+        """Le professeur voit tous les utilisateurs, l'étudiant voit seulement lui-même"""
+        user = self.request.user
+        if hasattr(user, 'role') and user.role == 'professor':
+            return User.objects.all()
+        return User.objects.filter(id=user.id)
 
 # 🔹 Vue API Exercices (SEULS LES PROFESSEURS peuvent CRÉER, MODIFIER, SUPPRIMER)
 class ExerciseViewSet(viewsets.ModelViewSet):
@@ -49,14 +52,23 @@ class ExerciseViewSet(viewsets.ModelViewSet):
 class SubmissionViewSet(viewsets.ModelViewSet):
     queryset = Submission.objects.all()
     serializer_class = SubmissionSerializer
-    permission_classes = [permissions.IsAuthenticated, IsStudent]
+
+    def get_permissions(self):
+        if self.action == 'create':
+            permission_classes = [permissions.IsAuthenticated, IsStudent]
+        else:
+            permission_classes = [permissions.IsAuthenticated]
+        return [permission() for permission in permission_classes]
 
     def perform_create(self, serializer):
         file = self.request.FILES.get('pdf')  # Récupérer le fichier PDF
         if file:
             file_url = upload_pdf(file)  # Téléverser sur Supabase
+            # Enregistrer la soumission avec l'URL du PDF
             serializer.save(student=self.request.user, pdf_url=file_url)
-            extracted_text = extract_text_from_pdf(file)  # Extraire le texte
+
+            # Extraire le texte depuis l'URL Supabase (et non le fichier uploadé)
+            extracted_text = extract_text_from_pdf(file_url)
             processed_text = preprocess_text(extracted_text)  # Nettoyer le texte
 
             # Comparer avec les soumissions existantes
@@ -73,9 +85,8 @@ class SubmissionViewSet(viewsets.ModelViewSet):
                     submission_id_2=all_submissions[0].id if all_submissions else None,
                     similarity_score=max(tfidf_score, jaccard_score)
                 )
+            # (Pas besoin d'un second serializer.save)
 
-            # Enregistrer la soumission
-            serializer.save(student=self.request.user, pdf_url=file_url)
         else:
             raise serializers.ValidationError("Aucun fichier PDF fourni.")
 
@@ -85,29 +96,11 @@ class CorrectionViewSet(viewsets.ReadOnlyModelViewSet):
     serializer_class = CorrectionSerializer
     permission_classes = [permissions.IsAuthenticated]
 
-# 🔹 Vue API Détection de Plagiat (Lecture seule - Accessible à tout utilisateur connecté)
+# Vue API Détection de Plagiat (Lecture seule - Accessible à tout utilisateur connecté)
 class PlagiarismCheckViewSet(viewsets.ReadOnlyModelViewSet):
     queryset = PlagiarismCheck.objects.all()
     serializer_class = PlagiarismCheckSerializer
     permission_classes = [permissions.IsAuthenticated]
-class SubmissionViewSet(viewsets.ModelViewSet):
-    queryset = Submission.objects.all()
-    serializer_class = SubmissionSerializer
-    permission_classes = [permissions.IsAuthenticated, IsStudent]  # ✅ Seuls les étudiants peuvent soumettre
-
-    def perform_create(self, serializer):
-        file = self.request.FILES.get('pdf')  # Récupérer le fichier PDF
-        if file:
-            file_url = upload_pdf(file)  # ✅ Téléverser le fichier sur Supabase
-            extracted_text = extract_text_from_pdf(file_url)  # Passe l'URL du fichier téléchargé
-            processed_text = preprocess_text(extracted_text)
-            if file_url:
-                serializer.save(student=self.request.user, pdf_url=file_url)  # ✅ Sauvegarde dans la BDD
-            else:
-                raise serializers.ValidationError("Échec du téléchargement du fichier sur Supabase.")
-        else:
-            raise serializers.ValidationError("Aucun fichier PDF fourni.")
-        
 
 
 class EvaluateSubmissionView(APIView):
