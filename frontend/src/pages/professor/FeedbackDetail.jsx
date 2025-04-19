@@ -55,7 +55,7 @@ const FeedbackDetail = () => {
   return (
     <div className="p-8 max-w-4xl mx-auto">
       <div className="flex justify-between items-center mb-6">
-        <h1 className="text-2xl font-bold">Feedback détaillé</h1>
+        <h1 className="text-2xl font-bold text-black">Feedback détaillé</h1>
         {submission && (
           <Link 
             to={`/professor/exercise/${submission.exercise}/submissions`}
@@ -69,10 +69,10 @@ const FeedbackDetail = () => {
       {/* Informations sur l'exercice */}
       {exercise && (
         <div className="mb-6 bg-blue-50 p-4 rounded-lg">
-          <h2 className="text-xl font-semibold mb-2">Exercice : {exercise.title}</h2>
+          <h2 className="text-xl font-semibold mb-2 text-black">Exercice : {exercise.title}</h2>
           <div className="text-sm">
-            <p className="mb-2"><strong>Description :</strong></p>
-            <p className="whitespace-pre-line bg-white p-3 rounded border">{exercise.description}</p>
+            <p className="mb-2 text-black"><strong>Description :</strong></p>
+            <p className="whitespace-pre-line bg-white p-3 rounded border text-black">{exercise.description}</p>
           </div>
         </div>
       )}
@@ -80,9 +80,9 @@ const FeedbackDetail = () => {
       {/* Informations sur l'étudiant */}
       {submission && submission.student && (
         <div className="mb-6 bg-gray-50 p-4 rounded-lg">
-          <h2 className="text-xl font-semibold mb-2">Soumission</h2>
-          <p><strong>Étudiant :</strong> {submission.student.first_name} {submission.student.last_name}</p>
-          <p><strong>Date :</strong> {new Date(submission.submitted_at).toLocaleString()}</p>
+          <h2 className="text-xl font-semibold mb-2 text-black">Soumission</h2>
+          <p className="text-black"><strong>Étudiant :</strong> {submission.student?.first_name} {submission.student?.last_name}</p>
+          <p className="text-black"><strong>Date :</strong> {new Date(submission.submitted_at).toLocaleString()}</p>
           <p className="mt-2">
             <a 
               href={submission.pdf_url} 
@@ -98,15 +98,15 @@ const FeedbackDetail = () => {
       {/* Correction et feedback */}
       <div className="bg-green-50 p-4 rounded-lg">
         <div className="flex justify-between items-center mb-4">
-          <h2 className="text-xl font-semibold">Évaluation</h2>
-          <span className="text-3xl font-bold bg-white px-3 py-1 rounded-full border-2 border-green-500">
+          <h2 className="text-xl font-semibold text-black">Évaluation</h2>
+          <span className="text-3xl font-bold bg-white px-3 py-1 rounded-full border-2 border-green-500 text-black">
             {correction.grade}/20
           </span>
         </div>
         
         <div className="bg-white p-4 rounded border">
-          <h3 className="font-semibold mb-2">Feedback de l'IA :</h3>
-          <div className="prose max-w-none">
+          <h3 className="font-semibold mb-2 text-black">Feedback de l'IA :</h3>
+          <div className="prose max-w-none text-black">
             <ReactMarkdown>{correction.feedback}</ReactMarkdown>
           </div>
         </div>

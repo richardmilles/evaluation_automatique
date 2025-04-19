@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from 'react';
 import { AuthContext } from '../../context/AuthContext';
 import API from '../../api/axios';
 import PerformanceChart from '../../components/PerformanceChart';
+import StudentMenu from '../../components/StudentMenu';
 import { Link } from 'react-router-dom';
 import ReactMarkdown from 'react-markdown';
 
@@ -67,7 +68,9 @@ const chartData = submissions
 
 
   return (
-    <div className="p-8">
+    <>
+      <StudentMenu />
+      <div className="p-8 pt-24">
       <h1 className="text-3xl font-bold mb-2">Mon Tableau de Bord</h1>
       {studentInfo && (
         <div className="mb-6 text-lg text-gray-700">
@@ -82,12 +85,12 @@ const chartData = submissions
           <PerformanceChart data={chartData} />
           <table className="min-w-full bg-white border">
           <thead>
-            <tr className="bg-gray-100">
-              <th className="px-4 py-2 border">Exercice</th>
-              <th className="px-4 py-2 border">Date</th>
-              <th className="px-4 py-2 border">Note</th>
-              <th className="px-4 py-2 border">Feedback</th>
-              <th className="px-4 py-2 border">Fichier PDF</th>
+            <tr className="bg-gray-100 text-black">
+              <th className="px-4 py-2 border text-black">Exercice</th>
+              <th className="px-4 py-2 border text-black">Date</th>
+              <th className="px-4 py-2 border text-black">Note</th>
+              <th className="px-4 py-2 border text-black">Feedback</th>
+              <th className="px-4 py-2 border text-black">Fichier PDF</th>
             </tr>
           </thead>
           <tbody>
@@ -96,14 +99,14 @@ const chartData = submissions
               // console.log('sub:', sub, 'corr:', corr);
               return (
                 <tr key={sub.id}>
-                  <td className="px-4 py-2 border">{sub.exercise}</td>
-                  <td className="px-4 py-2 border">
+                  <td className="px-4 py-2 border text-black">{sub.exercise}</td>
+                  <td className="px-4 py-2 border text-black">
                     {new Date(sub.submitted_at).toLocaleDateString()}
                   </td>
-                  <td className="px-4 py-2 border">
+                  <td className="px-4 py-2 border text-black">
                     {corr ? `${corr.grade}/20` : 'En attente'}
                   </td>
-                  <td className="px-4 py-2 border whitespace-pre-wrap">
+                  <td className="px-4 py-2 border whitespace-pre-wrap text-black">
                     {corr ? (
                       <>
                         <div className="max-h-16 overflow-hidden text-sm mb-2">
@@ -118,7 +121,7 @@ const chartData = submissions
                       </>
                     ) : '—'}
                   </td>
-                  <td className="px-4 py-2 border">
+                  <td className="px-4 py-2 border text-black">
                     <a
                       href={sub.pdf_url}
                       target="_blank"
@@ -136,6 +139,7 @@ const chartData = submissions
         </>
       )}
       </div>
+    </>
   );
 };
 

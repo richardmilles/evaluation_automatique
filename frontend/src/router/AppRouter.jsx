@@ -11,6 +11,8 @@ import ProtectedRoute from './ProtectedRoute';
 import SubmissionList from '../pages/professor/SubmissionList';
 import FeedbackDetail from '../pages/professor/FeedbackDetail';
 import StudentFeedbackDetail from '../pages/student/StudentFeedbackDetail';
+import Feedbacks from '../pages/student/Feedbacks';
+import ExercisesList from '../pages/professor/ExercisesList';
 
 const AppRouter = () => {
   return (
@@ -35,6 +37,14 @@ const AppRouter = () => {
           element={
             <ProtectedRoute allowedRoles={['student']}>
               <Submit />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/student/feedbacks"
+          element={
+            <ProtectedRoute allowedRoles={['student']}>
+              <Feedbacks />
             </ProtectedRoute>
           }
         />
@@ -69,6 +79,22 @@ const AppRouter = () => {
           element={
             <ProtectedRoute allowedRoles={['professor']}>
               <SubmissionList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/professor/exercises"
+          element={
+            <ProtectedRoute allowedRoles={['professor']}>
+              <ExercisesList />
+            </ProtectedRoute>
+          }
+        />
+        <Route
+          path="/professor/submissions"
+          element={
+            <ProtectedRoute allowedRoles={['professor']}>
+              <ExercisesList />
             </ProtectedRoute>
           }
         />

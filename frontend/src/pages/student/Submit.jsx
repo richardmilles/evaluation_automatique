@@ -1,5 +1,6 @@
 // src/pages/student/Submit.jsx
 import { useState, useContext, useEffect } from 'react';
+import StudentMenu from '../../components/StudentMenu';
 import { AuthContext } from '../../context/AuthContext';
 import API from '../../api/axios';
 import { useNavigate } from 'react-router-dom';
@@ -60,47 +61,55 @@ const Submit = () => {
   }, []);
 
   return (
-    <div className="max-w-lg mx-auto p-8">
-      <h1 className="text-2xl font-bold mb-6">Soumettre un exercice</h1>
-      {error && <p className="text-red-500 mb-4">{error}</p>}
-      {message && <p className="text-green-600 mb-4">{message}</p>}
+    <>
+      <StudentMenu />
+      <div className="max-w-xl mx-auto bg-white p-8 rounded shadow mt-8 pt-24">
+        <h1 className="text-2xl font-bold mb-6 text-black">Soumettre un exercice</h1>
+        {error && <p className="text-red-500 mb-4">{error}</p>}
+        {message && <p className="text-green-600 mb-4">{message}</p>}
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        <div>
-          <label className="block mb-1">Exercice (ID)</label>
-          <select
-            value={exerciseId}
-            onChange={e => setExerciseId(e.target.value)}
-            className="border p-2 rounded w-full"
-            required
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <div>
+            <label className="block mb-1 text-black">Exercice (ID)</label>
+            <select
+              value={exerciseId}
+              onChange={e => setExerciseId(e.target.value)}
+              className="border p-2 rounded w-full"
+              required
+            >
+              <option value="">-- Choisir un exercice --</option>
+              {exercises.map(ex => (
+                <option key={ex.id} value={ex.id}>
+                  {ex.title}
+                </option>
+              ))}
+            </select>
+          </div>
+          <div>
+            <label className="block mb-1 text-black">Fichier PDF</label>
+            <div className="flex items-center gap-2">
+  <input
+    type="file"
+    accept="application/pdf"
+    onChange={handleFileChange}
+    className="w-full text-black"
+    style={{ color: 'black' }}
+  />
+  <span className="text-black text-sm">
+    {file ? file.name : 'No file chosen'}
+  </span>
+</div>
+          </div>
+          <button
+            type="submit"
+            disabled={loading}
+            className="btn w-full"
           >
-            <option value="">-- Choisir un exercice --</option>
-            {exercises.map(ex => (
-              <option key={ex.id} value={ex.id}>
-                {ex.title}
-              </option>
-            ))}
-          </select>
-
-        </div>
-        <div>
-          <label className="block mb-1">Fichier PDF</label>
-          <input
-            type="file"
-            accept="application/pdf"
-            onChange={handleFileChange}
-            className="w-full"
-          />
-        </div>
-        <button
-          type="submit"
-          disabled={loading}
-          className="btn w-full"
-        >
-          {loading ? 'Envoi en cours…' : 'Envoyer'}
-        </button>
-      </form>
-    </div>
+            {loading ? 'Envoi en cours…' : 'Envoyer'}
+          </button>
+        </form>
+      </div>
+    </>
   );
 };
 

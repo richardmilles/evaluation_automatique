@@ -7,6 +7,7 @@ const SubmissionList = () => {
   const { exerciseId } = useParams();            // on passera /professor/exercise/:exerciseId/submissions
   const [subs, setSubs] = useState([]);
   const [corrs, setCorrs] = useState([]);
+  const [plagChecks, setPlagChecks] = useState([]);
   const [loading, setLoading] = useState(true);
   const [evaluating, setEvaluating] = useState(null); // ID de la soumission en cours d'évaluation
   const [message, setMessage] = useState(null); // Message de confirmation
@@ -15,17 +16,19 @@ const SubmissionList = () => {
     const fetchAll = async () => {
       setLoading(true);
       try {
-        // Récupérer les soumissions, corrections et utilisateurs
-        const [subRes, corrRes, usersRes] = await Promise.all([
+        // Récupérer les soumissions, corrections, utilisateurs ET plagiat
+        const [subRes, corrRes, usersRes, plagRes] = await Promise.all([
           API.get('/submissions/'),
           API.get('/corrections/'),
-          API.get('/users/')
+          API.get('/users/'),
+          API.get('/plagiarism/')
         ]);
 
         // Debug: log API responses
         console.log('subRes.data:', subRes.data);
         console.log('corrRes.data:', corrRes.data);
         console.log('usersRes.data:', usersRes.data);
+        console.log('plagRes.data:', plagRes.data);
         
         // Filtrer les soumissions pour cet exercice
         const filtered = subRes.data.filter(s => s.exercise === parseInt(exerciseId));
@@ -40,6 +43,7 @@ const SubmissionList = () => {
         console.log('enrichedSubs:', enrichedSubs);
         setSubs(enrichedSubs);
         setCorrs(corrRes.data);
+        setPlagChecks(plagRes.data);
       } catch (error) {
         console.error('Erreur lors du chargement des données:', error);
         setMessage({ type: 'error', text: 'Erreur lors du chargement des données' });
@@ -67,6 +71,17 @@ const SubmissionList = () => {
     }
   };
 
+  // Map submissionId → score max de plagiat
+  const plagMap = {};
+  plagChecks.forEach(pc => {
+    if (!plagMap[pc.submission_id_1] || pc.similarity_score > plagMap[pc.submission_id_1]) {
+      plagMap[pc.submission_id_1] = pc.similarity_score;
+    }
+    if (!plagMap[pc.submission_id_2] || pc.similarity_score > plagMap[pc.submission_id_2]) {
+      plagMap[pc.submission_id_2] = pc.similarity_score;
+    }
+  });
+
   if (loading) return <div className="p-8 text-center">Chargement des soumissions...</div>;
 
   return (
@@ -87,11 +102,12 @@ const SubmissionList = () => {
         <table className="min-w-full bg-white border">
           <thead>
             <tr className="bg-gray-100">
-              <th className="px-4 py-2 border">Étudiant</th>
-              <th className="px-4 py-2 border">Date de soumission</th>
-              <th className="px-4 py-2 border">Note</th>
-              <th className="px-4 py-2 border">Feedback</th>
-              <th className="px-4 py-2 border">Document</th>
+              <th className="px-4 py-2 border text-black">Étudiant</th>
+              <th className="px-4 py-2 border text-black">Date de soumission</th>
+              <th className="px-4 py-2 border text-black">Note</th>
+              <th className="px-4 py-2 border text-black">Plagiat (%)</th>
+              <th className="px-4 py-2 border text-black">Feedback</th>
+              <th className="px-4 py-2 border text-black">Document</th>
             </tr>
           </thead>
           <tbody>
@@ -99,12 +115,11 @@ const SubmissionList = () => {
               const corr = corrs.find(c => c.submission && c.submission.id === s.id);
               return (
                 <tr key={s.id}>
-                  <td className="px-4 py-2 border">
-                    {/* Version simplifiée pour afficher le nom et prénom */}
+                  <td className="px-4 py-2 border text-black">
                     {s.student?.first_name} {s.student?.last_name}
                   </td>
-                  <td className="px-4 py-2 border">{new Date(s.submitted_at).toLocaleDateString()}</td>
-                  <td className="px-4 py-2 border">
+                  <td className="px-4 py-2 border text-black">{new Date(s.submitted_at).toLocaleDateString()}</td>
+                  <td className="px-4 py-2 border text-black">
                     {corr ? (
                       <span className="font-bold">{corr.grade}/20</span>
                     ) : evaluating === s.id ? (
@@ -121,7 +136,10 @@ const SubmissionList = () => {
                       </button>
                     )}
                   </td>
-                  <td className="px-4 py-2 border">
+                  <td className={`px-4 py-2 border ${plagMap[s.id] > 80 ? 'text-red-600' : ''}`}>
+                    {plagMap[s.id] > 0 ? `${Math.round(plagMap[s.id])}%` : '—'}
+                  </td>
+                  <td className="px-4 py-2 border text-black">
                     {corr ? (
                       <div>
                         <div className="max-h-16 overflow-hidden text-sm mb-2">
@@ -136,7 +154,7 @@ const SubmissionList = () => {
                       </div>
                     ) : '—'}
                   </td>
-                  <td className="px-4 py-2 border">
+                  <td className="px-4 py-2 border text-black">
                     <a 
                       href={s.pdf_url} 
                       target="_blank" 

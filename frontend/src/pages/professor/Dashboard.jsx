@@ -3,6 +3,7 @@ import { AuthContext } from '../../context/AuthContext';
 import API from '../../api/axios';
 import { Link } from 'react-router-dom';
 import ProfessorStatsChart from '../../components/ProfessorStatsChart';
+import ProfessorMenu from '../../components/ProfessorMenu';
 
 const ProfessorDashboard = () => {
   const { user } = useContext(AuthContext);
@@ -63,7 +64,9 @@ const ProfessorDashboard = () => {
   if (error) return <p className="p-4 text-red-500">{error}</p>;
 
   return (
-    <div className="p-8">
+    <>
+      <ProfessorMenu />
+      <div className="p-8 pt-24">
       <h1 className="text-3xl font-bold mb-2">Tableau de bord Professeur</h1>
       {profInfo && (
         <div className="mb-6 text-lg text-gray-700">
@@ -88,25 +91,25 @@ const ProfessorDashboard = () => {
 
           <table className="min-w-full bg-white border">
             <thead>
-              <tr className="bg-gray-100">
-                <th className="px-4 py-2 border">Titre</th>
-                <th className="px-4 py-2 border">Date</th>
-                <th className="px-4 py-2 border">Soumissions</th>
-                <th className="px-4 py-2 border">Corrigées</th>
-                <th className="px-4 py-2 border">Actions</th>
+              <tr className="bg-gray-100 text-black">
+                <th className="px-4 py-2 border text-black">Titre</th>
+                <th className="px-4 py-2 border text-black">Date</th>
+                <th className="px-4 py-2 border text-black">Soumissions</th>
+                <th className="px-4 py-2 border text-black">Corrigées</th>
+                <th className="px-4 py-2 border text-black">Actions</th>
               </tr>
             </thead>
 
             <tbody>
               {exercises.map(ex => (
                 <tr key={ex.id}>
-                  <td className="px-4 py-2 border">{ex.title}</td>
-                  <td className="px-4 py-2 border">
+                  <td className="px-4 py-2 border text-black">{ex.title}</td>
+                  <td className="px-4 py-2 border text-black">
                     {new Date(ex.created_at).toLocaleDateString()}
                   </td>
-                  <td className="px-4 py-2 border">{countSubs(ex.id)}</td>
-                  <td className="px-4 py-2 border">{countCorr(ex.id)}</td>
-                  <td className="px-4 py-2 border">
+                  <td className="px-4 py-2 border text-black">{countSubs(ex.id)}</td>
+                  <td className="px-4 py-2 border text-black">{countCorr(ex.id)}</td>
+                  <td className="px-4 py-2 border text-black">
                     <Link
                       to={`/professor/exercise/${ex.id}/submissions`}
                       className="text-blue-500 underline"
@@ -121,6 +124,7 @@ const ProfessorDashboard = () => {
         </>
       )}
     </div>
+    </>
   );
 };
 

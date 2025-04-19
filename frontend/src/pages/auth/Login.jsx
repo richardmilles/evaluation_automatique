@@ -13,10 +13,13 @@ const Login = () => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
+    console.log('Tentative de connexion avec:', form);
     try {
       await login(form.username, form.password);   // ▶︎ appel AuthContext
+      console.log('Connexion réussie, redirection...');
       navigate('/post-login');                  // redirection gérée étape 7
-    } catch {
+    } catch (err) {
+      console.error('Erreur lors de la connexion:', err);
       setError('Identifiants invalides');
     }
   };

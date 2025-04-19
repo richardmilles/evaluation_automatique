@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import API from '../../api/axios';
 import { useNavigate } from 'react-router-dom';
+import ProfessorMenu from '../../components/ProfessorMenu';
 
 const CreateExercise = () => {
   const navigate = useNavigate();
@@ -32,7 +33,9 @@ const CreateExercise = () => {
   };
 
   return (
-    <div className="max-w-lg mx-auto p-8">
+    <>
+      <ProfessorMenu />
+      <div className="max-w-lg mx-auto p-8 pt-24">
       <h1 className="text-2xl font-bold mb-6">Créer un exercice</h1>
       {error && <p className="text-red-500 mb-4">{error}</p>}
       <form onSubmit={handleSubmit} className="space-y-4">
@@ -78,6 +81,7 @@ const CreateExercise = () => {
         </button>
       </form>
     </div>
+    </>
   );
 };
 
