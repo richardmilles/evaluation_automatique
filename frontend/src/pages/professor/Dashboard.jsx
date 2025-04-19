@@ -9,11 +9,16 @@ const ProfessorDashboard = () => {
   const [exercises, setExercises] = useState([]);
   const [submissions, setSubmissions] = useState([]);
   const [corrections, setCorrections] = useState([]);
+  const [profInfo, setProfInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState('');
 
   useEffect(() => {
     if (!user) return;
+    // Récupère les infos détaillées du professeur connecté
+    API.get(`/users/${user.id}/`)
+      .then(res => setProfInfo(res.data))
+      .catch(() => setProfInfo(null));
 
     const fetchData = async () => {
       try {
@@ -59,8 +64,12 @@ const ProfessorDashboard = () => {
 
   return (
     <div className="p-8">
-      <h1 className="text-3xl font-bold mb-6">Tableau de bord Professeur</h1>
-
+      <h1 className="text-3xl font-bold mb-2">Tableau de bord Professeur</h1>
+      {profInfo && (
+        <div className="mb-6 text-lg text-gray-700">
+          Professeur : <span className="font-semibold">{profInfo.first_name} {profInfo.last_name}</span>
+        </div>
+      )}
       <Link to="/professor/create" className="btn mb-4">
         + Créer un exercice
       </Link>

@@ -15,6 +15,7 @@ const PerformanceChart = ({ data }) => (
       </LineChart>
     </ResponsiveContainer>
   </div>
-);
+);   
+
 
 export default PerformanceChart;

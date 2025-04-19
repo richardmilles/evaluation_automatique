@@ -10,11 +10,17 @@ const StudentDashboard = () => {
   const { user } = useContext(AuthContext);
   const [submissions, setSubmissions] = useState([]);
   const [corrections, setCorrections] = useState([]);
+  const [studentInfo, setStudentInfo] = useState(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
     if (!user) return;
+    // Récupère les infos détaillées de l'étudiant connecté
+    API.get(`/users/${user.id}/`)
+      .then(res => setStudentInfo(res.data))
+      .catch(() => setStudentInfo(null));
+    console.log('user object:', user);
     const fetchData = async () => {
       try {
         // Récupérer toutes les soumissions
@@ -62,7 +68,12 @@ const chartData = submissions
 
   return (
     <div className="p-8">
-      <h1 className="text-3xl font-bold mb-6">Mon Tableau de Bord</h1>
+      <h1 className="text-3xl font-bold mb-2">Mon Tableau de Bord</h1>
+      {studentInfo && (
+        <div className="mb-6 text-lg text-gray-700">
+          Étudiant : <span className="font-semibold">{studentInfo.first_name} {studentInfo.last_name}</span>
+        </div>
+      )}
       {submissions.length === 0 ? (
         <p>Aucune soumission pour l’instant.</p>
       ) : (
