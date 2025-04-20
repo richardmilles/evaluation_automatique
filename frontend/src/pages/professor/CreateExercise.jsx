@@ -62,7 +62,7 @@ const CreateExercise = () => {
           />
         </div>
         <div>
-          <label className="block mb-1">Réponse Modèle (SQL)</label>
+          <label className="block mb-1">Réponse Modèle</label>
           <textarea
             name="model_answer"
             value={form.model_answer}
