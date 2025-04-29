@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useParams, Link } from 'react-router-dom';
 import API from '../../api/axios';
 import ReactMarkdown from 'react-markdown';
+import ProfessorMenu from '../../components/ProfessorMenu';
 
 const FeedbackDetail = () => {
   const { correctionId } = useParams();
@@ -53,7 +54,9 @@ const FeedbackDetail = () => {
   if (!correction) return <div className="p-8 bg-yellow-100 text-yellow-800 rounded">Correction non trouvée</div>;
 
   return (
-    <div className="p-8 max-w-4xl mx-auto">
+    <div style={{ minHeight: '100vh', background: '#f9fafb' }}>
+      <ProfessorMenu />
+      <div className="p-8 max-w-4xl mx-auto pt-24">
       <div className="flex justify-between items-center mb-6">
         <h1 className="text-2xl font-bold text-black">Feedback détaillé</h1>
         {submission && (
@@ -110,6 +113,7 @@ const FeedbackDetail = () => {
             <ReactMarkdown>{correction.feedback}</ReactMarkdown>
           </div>
         </div>
+      </div>
       </div>
     </div>
   );

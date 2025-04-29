@@ -1,6 +1,6 @@
 from django.urls import path, include
 from rest_framework.routers import DefaultRouter
-from .views import EvaluateSubmissionView, PlagiarismCheckView, UserViewSet, ExerciseViewSet, SubmissionViewSet, CorrectionViewSet, PlagiarismCheckViewSet
+from .views import EvaluateSubmissionView, PlagiarismCheckView, UserViewSet, ExerciseViewSet, SubmissionViewSet, CorrectionViewSet, PlagiarismCheckViewSet, detect_plagiarism_for_exercise
 
 # 🔹 Création d'un routeur API REST
 router = DefaultRouter()
@@ -14,7 +14,7 @@ urlpatterns = [
     path('', include(router.urls)),  # Inclure toutes les routes définies dans le routeur
     path('evaluation/<int:submission_id>/', EvaluateSubmissionView.as_view(), name='evaluate_submission'),
     path('plagiarism/', PlagiarismCheckView.as_view(), name='plagiarism_check'),
-    
+    path('detect_plagiarism/<int:exercise_id>/', detect_plagiarism_for_exercise, name='detect_plagiarism_for_exercise'),
 ]
 # Compare this snippet from api/serializers.py:
 # from rest_framework import serializers

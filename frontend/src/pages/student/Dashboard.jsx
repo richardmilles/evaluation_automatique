@@ -58,13 +58,27 @@ const StudentDashboard = () => {
 // transformer submissions+corrections en séries chronologiques
 const chartData = submissions
   .map(sub => {
-    const corr = corrections.find(c => c.submission === sub.id);
-    return {
-      date: new Date(sub.submitted_at).toLocaleDateString(),
-      grade: corr?.grade ?? 0
-    };
+    // Trouver la correction correspondante, si elle existe
+    const corr = corrections.find(
+      c => (c.submission?.id || c.submission) === sub.id
+    );
+    // Ne retourner un objet que si une correction avec note existe
+    if (corr && corr.grade !== null && corr.grade !== undefined) {
+      return {
+        date: new Date(sub.submitted_at).toLocaleDateString(),
+        grade: parseFloat(corr.grade) // Conversion string en number
+      };
+    }
+    // Sinon, retourner null (sera filtré ensuite)
+    return null;
   })
+  // Filtrer les entrées null (soumissions sans note)
+  .filter(item => item !== null)
+  // Trier par date
   .sort((a, b) => new Date(a.date) - new Date(b.date));
+  
+// Log pour debug
+console.log('[StudentDashboard] Données graphique (soumissions avec note uniquement):', chartData);
 
 
   return (

@@ -21,7 +21,7 @@ export default function ProfessorMenu() {
       <div className="font-bold text-lg">Espace Professeur</div>
       {menuItems.map(item => (
         <Link
-          key={item.path}
+          key={item.path + '-' + item.label}
           to={item.path}
           className={`hover:underline px-2 py-1 rounded text-white transition-colors duration-150 ${location.pathname.startsWith(item.path) ? 'bg-blue-800' : ''} hover:text-black hover:bg-white`}
         >

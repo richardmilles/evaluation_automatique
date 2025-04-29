@@ -56,12 +56,14 @@ const ProfessorDashboard = () => {
   const countCorr = exId =>
     corrections.filter(c =>
       submissions.some(
-        s => s.id === c.submission && s.exercise === exId
+        s => c.submission && s.id === c.submission.id && s.exercise === exId
       )
     ).length;
 
   if (loading) return <p className="p-4">Chargement…</p>;
   if (error) return <p className="p-4 text-red-500">{error}</p>;
+
+  // Logs temporaires supprimés, problème identifié: grade est un string, pas un number
 
   return (
     <>
@@ -96,6 +98,7 @@ const ProfessorDashboard = () => {
                 <th className="px-4 py-2 border text-black">Date</th>
                 <th className="px-4 py-2 border text-black">Soumissions</th>
                 <th className="px-4 py-2 border text-black">Corrigées</th>
+                <th className="px-4 py-2 border text-black">Moyenne</th>
                 <th className="px-4 py-2 border text-black">Actions</th>
               </tr>
             </thead>
@@ -109,6 +112,27 @@ const ProfessorDashboard = () => {
                   </td>
                   <td className="px-4 py-2 border text-black">{countSubs(ex.id)}</td>
                   <td className="px-4 py-2 border text-black">{countCorr(ex.id)}</td>
+                  <td className="px-4 py-2 border text-black">{
+                    (() => {
+                      // Calcul de la moyenne des notes pour cet exercice
+                      // Trouver toutes les corrections dont la soumission appartient à cet exercice et qui ont une note valide
+                      // Pour chaque soumission de cet exercice, cherche la correction correspondante et prends la note convertie en nombre si elle existe
+                      const grades = submissions
+                        .filter(s => s.exercise === ex.id)
+                        .map(s => {
+                          const corr = corrections.find(c => c.submission && c.submission.id === s.id);
+                          // Conversion string en number et vérification de validité
+                          return corr ? parseFloat(corr.grade) : null;
+                        })
+                        .filter(g => g !== null && !isNaN(g));
+
+                      // DEBUG: Affichage temporaire pour vérifier les notes utilisées
+                      console.log(`Exercice: ${ex.title} (id ${ex.id}) - Notes utilisées:`, grades);
+                      // Affichage temporaire dans le tableau (à retirer après debug)
+                      if (!grades.length) return <span title="Aucune note">—</span>;
+                      return <span title={grades.join(', ')}>{(grades.reduce((a, b) => a + b, 0) / grades.length).toFixed(1)}</span>;
+                    })()
+                  }</td>
                   <td className="px-4 py-2 border text-black">
                     <Link
                       to={`/professor/exercise/${ex.id}/submissions`}
