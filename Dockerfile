@@ -23,6 +23,6 @@ RUN python manage.py collectstatic --noinput || true
 EXPOSE $PORT
 
 # Lancer l'app avec gunicorn
-CMD ["sh", "-c", "gunicorn config.wsgi:application --bind 0.0.0.0:$PORT"]
+CMD gunicorn config.wsgi:application --bind 0.0.0.0:$PORT
 
 
